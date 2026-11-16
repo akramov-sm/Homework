@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINORA — Студия Личных Финансов</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            deep: '#14251F',
+                            forest: '#203A30',
+                            light: '#2A4B3E',
+                            accent: '#1B382B'
+                        },
+                        gold: {
+                            champagne: '#C5A46D',
+                            hover: '#D4B57E',
+                            light: '#DFCB9B',
+                            soft: 'rgba(197, 164, 109, 0.15)'
+                        },
+                        neutral: {
+                            ivory: '#F5F2EA',
+                            beige: '#E8E2D5',
+                            graphite: '#252A27',
+                            cardDark: '#1A2320',
+                            bodyDark: '#0F1A16',
+                            borderDark: '#2D3E36',
+                            cardLight: '#FFFFFF',
+                            bodyLight: '#F9F8F3',
+                            borderLight: '#E3DEC3'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(197, 164, 109, 0.3);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(197, 164, 109, 0.6);
+        }
+        .page-transition {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .glass-card {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-neutral-bodyLight dark:bg-neutral-bodyDark text-neutral-graphite dark:text-neutral-ivory font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col md:flex-row">
+
+    <!-- Mobile Header -->
+    <header class="md:hidden flex items-center justify-between p-4 bg-white dark:bg-emerald-deep border-b border-neutral-borderLight dark:border-neutral-borderDark sticky top-0 z-40">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-gold-champagne flex items-center justify-center text-emerald-deep font-serif font-bold text-lg">F</div>
+            <span class="font-serif font-bold text-xl tracking-wider text-emerald-deep dark:text-gold-champagne">FINORA</span>
+        </div>
+        <button id="mobileMenuBtn" class="p-2 rounded-lg text-emerald-deep dark:text-neutral-ivory hover:bg-neutral-beige dark:hover:bg-emerald-forest">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </header>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-emerald-deep border-r border-neutral-borderLight dark:border-neutral-borderDark transform -translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out flex flex-col justify-between">
+        <div class="p-6">
+            <!-- Brand Logo -->
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-champagne to-gold-hover flex items-center justify-center text-emerald-deep font-serif font-bold text-2xl shadow-md">F</div>
+                    <div>
+                        <h1 class="font-serif font-bold text-2xl tracking-wider text-emerald-deep dark:text-gold-champagne">FINORA</h1>
+                        <p class="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400">Personal Finance</p>
+                    </div>
+                </div>
+                <button id="closeSidebarBtn" class="md:hidden p-1 rounded-lg text-neutral-400 hover:text-neutral-200">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Global Controls: Currency & Theme -->
+            <div class="mb-6 p-3 rounded-xl bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="coins" class="w-4 h-4 text-gold-champagne"></i>
+                    <select id="currencySelect" class="bg-transparent text-xs font-semibold text-neutral-graphite dark:text-neutral-ivory focus:outline-none cursor-pointer">
+                        <option value="UZS" class="bg-white dark:bg-emerald-deep text-neutral-graphite dark:text-neutral-ivory">UZS (сум)</option>
+                        <option value="USD" class="bg-white dark:bg-emerald-deep text-neutral-graphite dark:text-neutral-ivory">USD ($)</option>
+                        <option value="EUR" class="bg-white dark:bg-emerald-deep text-neutral-graphite dark:text-neutral-ivory">EUR (€)</option>
+                    </select>
+                </div>
+                <button id="themeToggleBtn" class="p-1.5 rounded-lg text-neutral-600 dark:text-gold-champagne hover:bg-neutral-beige dark:hover:bg-emerald-deep transition-colors">
+                    <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="space-y-1">
+                <a href="#overview" data-page="overview" class="nav-link active flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-gold-champagne bg-gold-soft dark:bg-gold-soft font-semibold border-l-4 border-gold-champagne">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Обзор</span>
+                </a>
+                <a href="#budget" data-page="budget" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-beige/50 dark:hover:bg-emerald-forest/50">
+                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                    <span>Мой бюджет</span>
+                </a>
+                <a href="#expenses" data-page="expenses" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-beige/50 dark:hover:bg-emerald-forest/50">
+                    <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                    <span>Анализ расходов</span>
+                </a>
+                <a href="#savings" data-page="savings" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-beige/50 dark:hover:bg-emerald-forest/50">
+                    <i data-lucide="target" class="w-4 h-4"></i>
+                    <span>Финансовые цели</span>
+                </a>
+                <a href="#calculators" data-page="calculators" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-beige/50 dark:hover:bg-emerald-forest/50">
+                    <i data-lucide="calculator" class="w-4 h-4"></i>
+                    <span>Калькуляторы</span>
+                </a>
+                <a href="#academy" data-page="academy" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-beige/50 dark:hover:bg-emerald-forest/50">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    <span>Академия</span>
+                </a>
+                <a href="#quiz" data-page="quiz" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-beige/50 dark:hover:bg-emerald-forest/50">
+                    <i data-lucide="help-circle" class="w-4 h-4"></i>
+                    <span>Викторина</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="p-6 border-t border-neutral-borderLight dark:border-neutral-borderDark space-y-2">
+            <button id="openAboutBtn" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-100 hover:bg-neutral-beige/50 dark:hover:bg-emerald-forest/50 transition-colors">
+                <i data-lucide="info" class="w-4 h-4"></i>
+                <span>О FINORA</span>
+            </button>
+            <button id="resetDataBtn" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-medium text-rose-500 hover:bg-rose-500/10 transition-colors">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                <span>Сброс демо-данных</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Overlay for Mobile Sidebar -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 max-w-7xl mx-auto w-full">
+
+        <!-- 1. OVERVIEW PAGE -->
+        <section id="page-overview" class="page-content space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-borderLight dark:border-neutral-borderDark pb-6">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory">Welcome to FINORA</h2>
+                    <p class="text-neutral-500 dark:text-neutral-400 mt-1 text-sm md:text-base">Take control of your money. Build your future.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="text-xs px-3 py-1.5 rounded-full bg-gold-soft border border-gold-champagne/30 text-gold-champagne font-semibold flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-gold-champagne animate-pulse"></span>
+                        Живая Аналитика Премиум
+                    </span>
+                </div>
+            </div>
+
+            <!-- Top Summary Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Total Balance Card -->
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between text-neutral-500 dark:text-neutral-400 mb-3">
+                        <span class="text-xs font-medium uppercase tracking-wider">Общий Баланс</span>
+                        <div class="p-2 rounded-xl bg-gold-soft text-gold-champagne">
+                            <i data-lucide="credit-card" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl md:text-3xl font-bold font-serif text-emerald-deep dark:text-gold-champagne" id="overviewBalance">0 UZS</div>
+                    <div class="mt-2 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
+                        <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                        <span>+4.2% за прошлый месяц</span>
+                    </div>
+                </div>
+
+                <!-- Monthly Income Card -->
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between text-neutral-500 dark:text-neutral-400 mb-3">
+                        <span class="text-xs font-medium uppercase tracking-wider">Доход в месяц</span>
+                        <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                            <i data-lucide="arrow-down-right" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl md:text-3xl font-bold font-serif text-emerald-deep dark:text-neutral-ivory" id="overviewIncome">0 UZS</div>
+                    <div class="mt-2 text-xs text-neutral-400 flex items-center gap-1">
+                        <span>Зарплата и инвестиции</span>
+                    </div>
+                </div>
+
+                <!-- Monthly Expenses Card -->
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between text-neutral-500 dark:text-neutral-400 mb-3">
+                        <span class="text-xs font-medium uppercase tracking-wider">Расходы в месяц</span>
+                        <div class="p-2 rounded-xl bg-rose-500/10 text-rose-500">
+                            <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl md:text-3xl font-bold font-serif text-emerald-deep dark:text-neutral-ivory" id="overviewExpenses">0 UZS</div>
+                    <div class="mt-2 text-xs text-neutral-400 flex items-center gap-1">
+                        <span id="overviewExpenseRatio">0% от дохода</span>
+                    </div>
+                </div>
+
+                <!-- Total Savings Card -->
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between text-neutral-500 dark:text-neutral-400 mb-3">
+                        <span class="text-xs font-medium uppercase tracking-wider">Накопления</span>
+                        <div class="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+                            <i data-lucide="piggy-bank" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl md:text-3xl font-bold font-serif text-emerald-deep dark:text-neutral-ivory" id="overviewSavings">0 UZS</div>
+                    <div class="mt-2 text-xs text-gold-champagne font-medium flex items-center gap-1">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                        <span>План выполняется</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Cash Flow Line Chart -->
+                <div class="lg:col-span-2 bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory">Динамика денежного потока</h3>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400">Доходы vs Расходы за последние 6 месяцев</p>
+                        </div>
+                        <div class="flex items-center space-x-4 text-xs font-medium">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-gold-champagne inline-block"></span> Доходы</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-400 inline-block"></span> Расходы</span>
+                        </div>
+                    </div>
+                    <div class="h-64 relative">
+                        <canvas id="cashflowChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Expenses Structure Donut Chart -->
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory mb-1">Структура расходов</h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-4">Распределение за текущий месяц</p>
+                        <div class="h-52 relative flex items-center justify-center">
+                            <canvas id="expenseStructureChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-neutral-borderLight dark:border-neutral-borderDark text-center">
+                        <a href="#expenses" onclick="navigateTo('expenses')" class="text-xs text-gold-champagne font-semibold hover:underline inline-flex items-center gap-1">
+                            Перейти к детальному анализу <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Insights Section -->
+            <div class="bg-gradient-to-r from-emerald-deep to-emerald-forest dark:from-emerald-dark dark:to-neutral-cardDark p-6 rounded-2xl border border-gold-champagne/30 text-neutral-ivory relative overflow-hidden shadow-lg">
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-gold-champagne/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="p-2.5 rounded-xl bg-gold-champagne/20 text-gold-champagne">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif font-bold text-xl text-gold-champagne">Умные рекомендации FINORA</h3>
+                        <p class="text-xs text-neutral-300">Автоматический финансовый анализ на основе ваших показателей</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mt-4" id="insightsContainer">
+                    <!-- Dynamic Insights -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. MY BUDGET PAGE -->
+        <section id="page-budget" class="page-content hidden space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-borderLight dark:border-neutral-borderDark pb-6">
+                <div>
+                    <h2 class="text-3xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory">Управление личным бюджетом</h2>
+                    <p class="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">Учитывайте доходы, фиксируйте траты и формируйте здоровые привычки.</p>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-1">Ежемесячный доход</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="budgetIncomeInput" class="bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-lg font-bold text-emerald-deep dark:text-gold-champagne px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne w-48" placeholder="15000000">
+                        <span class="text-sm font-semibold text-neutral-400" id="incomeCurrencyLabel">UZS</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="p-3 rounded-xl bg-neutral-bodyLight dark:bg-emerald-forest">
+                        <span class="block text-[10px] text-neutral-400 uppercase">Потрачено</span>
+                        <span class="font-bold text-rose-400 text-sm md:text-base" id="budgetTotalSpent">0 UZS</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-neutral-bodyLight dark:bg-emerald-forest">
+                        <span class="block text-[10px] text-neutral-400 uppercase">Остаток</span>
+                        <span class="font-bold text-emerald-500 text-sm md:text-base" id="budgetRemaining">0 UZS</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-neutral-bodyLight dark:bg-emerald-forest">
+                        <span class="block text-[10px] text-neutral-400 uppercase">% Норма сбережений</span>
+                        <span class="font-bold text-gold-champagne text-sm md:text-base" id="budgetSavingsRate">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Add Expense Form -->
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm h-fit">
+                    <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory mb-4 flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-5 h-5 text-gold-champagne"></i>
+                        Добавить расход
+                    </h3>
+                    <form id="addExpenseForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">Категория</label>
+                            <select id="expenseCategory" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2.5 rounded-xl focus:outline-none focus:border-gold-champagne text-neutral-graphite dark:text-neutral-ivory" required>
+                                <option value="Housing">Жилье / Коммунальные</option>
+                                <option value="Groceries">Продукты питания</option>
+                                <option value="Transport">Транспорт / Авто</option>
+                                <option value="Restaurants">Кафе и рестораны</option>
+                                <option value="Shopping">Покупки и одежда</option>
+                                <option value="Entertainment">Развлечения</option>
+                                <option value="Education">Образование</option>
+                                <option value="Health">Здоровье и аптеки</option>
+                                <option value="Other">Прочее</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">Сумма (<span class="currency-symbol">UZS</span>)</label>
+                            <input type="number" id="expenseAmount" min="0" step="any" placeholder="например: 500000" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2.5 rounded-xl focus:outline-none focus:border-gold-champagne text-neutral-graphite dark:text-neutral-ivory" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">Описание</label>
+                            <input type="text" id="expenseDesc" placeholder="например: Покупка продуктов в Korzinka" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2.5 rounded-xl focus:outline-none focus:border-gold-champagne text-neutral-graphite dark:text-neutral-ivory" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-300 mb-1">Дата</label>
+                            <input type="date" id="expenseDate" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2.5 rounded-xl focus:outline-none focus:border-gold-champagne text-neutral-graphite dark:text-neutral-ivory" required>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-gold-champagne to-gold-hover text-emerald-deep font-semibold rounded-xl hover:shadow-lg transition-all text-sm flex items-center justify-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4"></i> Внести запись
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Expense Table -->
+                <div class="lg:col-span-2 bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory">История операций</h3>
+                            <input type="month" id="budgetMonthFilter" class="bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-xs px-3 py-1.5 rounded-lg focus:outline-none text-neutral-graphite dark:text-neutral-ivory">
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-neutral-borderLight dark:border-neutral-borderDark text-[11px] font-semibold text-neutral-400 uppercase">
+                                        <th class="pb-3 px-2">Категория</th>
+                                        <th class="pb-3 px-2">Описание</th>
+                                        <th class="pb-3 px-2">Дата</th>
+                                        <th class="pb-3 px-2 text-right">Сумма</th>
+                                        <th class="pb-3 px-2 text-center">Действие</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="budgetTableBody" class="divide-y divide-neutral-borderLight dark:divide-neutral-borderDark text-sm">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. EXPENSES ANALYSIS PAGE -->
+        <section id="page-expenses" class="page-content hidden space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-borderLight dark:border-neutral-borderDark pb-6">
+                <div>
+                    <h2 class="text-3xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory">Анализ расходов</h2>
+                    <p class="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">Глубокий аудит структуры трат и выявление «финансовых утечек».</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm">
+                    <span class="text-xs text-neutral-400 uppercase font-semibold">Общая сумма расходов</span>
+                    <div class="text-2xl md:text-3xl font-serif font-bold text-rose-500 mt-2" id="expTotalAmount">0 UZS</div>
+                    <p class="text-xs text-neutral-400 mt-2">Расчет по всем учтенным категориям</p>
+                </div>
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm">
+                    <span class="text-xs text-neutral-400 uppercase font-semibold">Самая затратная категория</span>
+                    <div class="text-xl md:text-2xl font-serif font-bold text-gold-champagne mt-2" id="expHighestCategory">-</div>
+                    <p class="text-xs text-neutral-400 mt-2" id="expHighestCategoryAmount">0 UZS потрачено</p>
+                </div>
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm">
+                    <span class="text-xs text-neutral-400 uppercase font-semibold">Средний чек транзакции</span>
+                    <div class="text-2xl md:text-3xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory mt-2" id="expAverage">0 UZS</div>
+                    <p class="text-xs text-neutral-400 mt-2" id="expTotalCount">0 всего операций</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm">
+                    <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory mb-4">Объем трат по категориям</h3>
+                    <div class="h-64 relative">
+                        <canvas id="expensesBarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm">
+                    <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory mb-4">Процентное соотношение (%)</h3>
+                    <div id="expensesCategoryList" class="space-y-4 max-h-64 overflow-y-auto pr-2">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. SAVINGS GOALS PAGE -->
+        <section id="page-savings" class="page-content hidden space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-borderLight dark:border-neutral-borderDark pb-6">
+                <div>
+                    <h2 class="text-3xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory">Финансовые цели</h2>
+                    <p class="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">Ставьте ключевые ориентиры, пополняйте капитал и достигайте их быстро.</p>
+                </div>
+                <button id="openAddGoalModalBtn" class="px-5 py-2.5 bg-gradient-to-r from-gold-champagne to-gold-hover text-emerald-deep font-semibold rounded-xl shadow hover:shadow-lg transition-all text-sm flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Создать цель
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="savingsGoalsContainer">
+            </div>
+        </section>
+
+        <!-- 5. FINANCIAL CALCULATORS PAGE -->
+        <section id="page-calculators" class="page-content hidden space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-borderLight dark:border-neutral-borderDark pb-6">
+                <div>
+                    <h2 class="text-3xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory">Финансовые калькуляторы</h2>
+                    <p class="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">Интерактивные симуляторы роста капитала, сложных процентов, кредитов и пропорций бюджетирования.</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-2 border-b border-neutral-borderLight dark:border-neutral-borderDark overflow-x-auto pb-2">
+                <button data-calc-tab="savings" class="calc-tab-btn px-4 py-2 text-sm font-semibold rounded-xl text-gold-champagne bg-gold-soft border border-gold-champagne/30">Накопления</button>
+                <button data-calc-tab="compound" class="calc-tab-btn px-4 py-2 text-sm font-medium rounded-xl text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200">Сложный процент</button>
+                <button data-calc-tab="budget503020" class="calc-tab-btn px-4 py-2 text-sm font-medium rounded-xl text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200">Правило 50/30/20</button>
+                <button data-calc-tab="loan" class="calc-tab-btn px-4 py-2 text-sm font-medium rounded-xl text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200">Аннуитетный кредит</button>
+            </div>
+
+            <!-- Tab A: Savings Calculator -->
+            <div id="calcTab-savings" class="calc-tab-content space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm space-y-4">
+                        <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory">Параметры накопления</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Начальная сумма (<span class="currency-symbol">UZS</span>)</label>
+                            <input type="number" id="savInitial" value="5000000" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Ежемесячное пополнение (<span class="currency-symbol">UZS</span>)</label>
+                            <input type="number" id="savMonthly" value="1000000" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Годовая ставка (%)</label>
+                            <input type="number" id="savRate" value="18" step="0.5" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Срок накопления (месяцев)</label>
+                            <input type="number" id="savMonths" value="24" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory mb-6">Прогноз результата</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                                <div class="p-4 rounded-xl bg-neutral-bodyLight dark:bg-emerald-forest">
+                                    <span class="text-xs text-neutral-400 block">Ваши взносы</span>
+                                    <span class="text-lg font-bold text-emerald-deep dark:text-neutral-ivory" id="savResultDeposits">0 UZS</span>
+                                </div>
+                                <div class="p-4 rounded-xl bg-neutral-bodyLight dark:bg-emerald-forest">
+                                    <span class="text-xs text-neutral-400 block">Начисленные проценты</span>
+                                    <span class="text-lg font-bold text-emerald-500" id="savResultInterest">0 UZS</span>
+                                </div>
+                                <div class="p-4 rounded-xl bg-gold-soft border border-gold-champagne/30">
+                                    <span class="text-xs text-gold-champagne block">Итоговая сумма</span>
+                                    <span class="text-xl font-bold font-serif text-gold-champagne" id="savResultTotal">0 UZS</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-neutral-400 italic">*Расчет использует ежемесячную капитализацию процентов по указанной годовой ставке.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab B: Compound Interest Calculator -->
+            <div id="calcTab-compound" class="calc-tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm space-y-4">
+                        <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory">Инвестиционные данные</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Начальный капитал (<span class="currency-symbol">UZS</span>)</label>
+                            <input type="number" id="compPrincipal" value="10000000" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Годовая процентная ставка (%)</label>
+                            <input type="number" id="compRate" value="20" step="0.5" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Срок (в годах)</label>
+                            <input type="number" id="compYears" value="5" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Частота капитализации</label>
+                            <select id="compFreq" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne text-neutral-graphite dark:text-neutral-ivory">
+                                <option value="12">Ежемесячно (12 раз в год)</option>
+                                <option value="4">Ежеквартально (4 раза в год)</option>
+                                <option value="1">Ежегодно (1 раз в год)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory mb-6">Магия сложного процента</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                                <div class="p-4 rounded-xl bg-neutral-bodyLight dark:bg-emerald-forest">
+                                    <span class="text-xs text-neutral-400 block">Первоначальный капитал</span>
+                                    <span class="text-lg font-bold text-emerald-deep dark:text-neutral-ivory" id="compResultPrincipal">0 UZS</span>
+                                </div>
+                                <div class="p-4 rounded-xl bg-gold-soft border border-gold-champagne/30">
+                                    <span class="text-xs text-gold-champagne block">Итоговый накопленный капитал</span>
+                                    <span class="text-xl font-bold font-serif text-gold-champagne" id="compResultTotal">0 UZS</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm">
+                            <span class="font-semibold block mb-1">Прирост капитала:</span>
+                            Ваши деньги выросли в <span class="font-bold text-gold-champagne" id="compResultMultiplier">0x</span> раз исключительно за счет реинвестирования процентов!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab C: 50/30/20 Budget Calculator -->
+            <div id="calcTab-budget503020" class="calc-tab-content hidden space-y-6">
+                <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm">
+                    <label class="block text-xs font-medium text-neutral-400 mb-1">Введите ваш ежемесячный доход (<span class="currency-symbol">UZS</span>)</label>
+                    <input type="number" id="b50Income" value="15000000" class="w-full sm:w-96 bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-lg font-bold px-4 py-2.5 rounded-xl focus:outline-none focus:border-gold-champagne text-gold-champagne">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border-t-4 border-blue-500 shadow-sm">
+                        <span class="text-xs font-bold text-blue-500 uppercase tracking-wider">50% — Обязательные нужды (Needs)</span>
+                        <div class="text-2xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory mt-3" id="b50Needs">0 UZS</div>
+                        <p class="text-xs text-neutral-400 mt-2">Аренда, коммунальные услуги, базовые продукты, лекарства и транспорт.</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border-t-4 border-gold-champagne shadow-sm">
+                        <span class="text-xs font-bold text-gold-champagne uppercase tracking-wider">30% — Личные желания (Wants)</span>
+                        <div class="text-2xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory mt-3" id="b50Wants">0 UZS</div>
+                        <p class="text-xs text-neutral-400 mt-2">Рестораны, хобби, подписки, развлечения, путешествия и шопинг.</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border-t-4 border-emerald-500 shadow-sm">
+                        <span class="text-xs font-bold text-emerald-500 uppercase tracking-wider">20% — Накопления и долги (Savings)</span>
+                        <div class="text-2xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory mt-3" id="b50Savings">0 UZS</div>
+                        <p class="text-xs text-neutral-400 mt-2">Финансовая подушка безопасности, инвестиции и досрочное погашение кредитов.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab D: Loan Calculator -->
+            <div id="calcTab-loan" class="calc-tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm space-y-4">
+                        <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory">Условия кредита</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Сумма кредита (<span class="currency-symbol">UZS</span>)</label>
+                            <input type="number" id="loanAmount" value="50000000" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Годовая процентная ставка (%)</label>
+                            <input type="number" id="loanRate" value="22" step="0.5" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-neutral-400 mb-1">Срок кредита (месяцев)</label>
+                            <input type="number" id="loanMonths" value="36" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne">
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory mb-6">Итог аннуитетного графика</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                                <div class="p-4 rounded-xl bg-gold-soft border border-gold-champagne/30">
+                                    <span class="text-xs text-gold-champagne block">Ежемесячный платеж</span>
+                                    <span class="text-xl font-bold font-serif text-gold-champagne" id="loanMonthly">0 UZS</span>
+                                </div>
+                                <div class="p-4 rounded-xl bg-neutral-bodyLight dark:bg-emerald-forest">
+                                    <span class="text-xs text-neutral-400 block">Общая сумма выплат</span>
+                                    <span class="text-lg font-bold text-emerald-deep dark:text-neutral-ivory" id="loanTotal">0 UZS</span>
+                                </div>
+                                <div class="p-4 rounded-xl bg-rose-500/10 text-rose-500">
+                                    <span class="text-xs block">Переплата по процентам</span>
+                                    <span class="text-lg font-bold" id="loanOverpayment">0 UZS</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-neutral-400 italic">*Рассчитано по стандартной формуле аннуитетных платежей с равными взносами каждый месяц.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. FINANCIAL ACADEMY PAGE -->
+        <section id="page-academy" class="page-content hidden space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-borderLight dark:border-neutral-borderDark pb-6">
+                <div>
+                    <h2 class="text-3xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory">Академия финансовой грамотности</h2>
+                    <p class="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">Интерактивные руководства, концепции грамотного управления капиталом и практические примеры.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="academyGrid">
+            </div>
+        </section>
+
+        <!-- 7. KNOWLEDGE QUIZ PAGE -->
+        <section id="page-quiz" class="page-content hidden space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-borderLight dark:border-neutral-borderDark pb-6">
+                <div>
+                    <h2 class="text-3xl font-serif font-bold text-emerald-deep dark:text-neutral-ivory">Проверка знаний</h2>
+                    <p class="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">Тест из 10 вопросов для проверки вашей финансовой подготовленности.</p>
+                </div>
+            </div>
+
+            <div class="max-w-2xl mx-auto bg-white dark:bg-neutral-cardDark p-6 sm:p-8 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-lg">
+                <div id="quizActiveState" class="space-y-6">
+                    <div class="flex items-center justify-between text-xs font-semibold text-neutral-400">
+                        <span id="quizProgressText">Вопрос 1 из 10</span>
+                        <span id="quizScoreTracker">Баллы: 0</span>
+                    </div>
+
+                    <div class="w-full h-2 bg-neutral-bodyLight dark:bg-emerald-forest rounded-full overflow-hidden">
+                        <div id="quizProgressBar" class="h-full bg-gold-champagne transition-all duration-300" style="width: 10%;"></div>
+                    </div>
+
+                    <h3 id="quizQuestion" class="font-serif font-bold text-xl text-emerald-deep dark:text-neutral-ivory"></h3>
+
+                    <div id="quizOptions" class="space-y-3">
+                    </div>
+
+                    <div id="quizFeedback" class="hidden p-4 rounded-xl text-sm border">
+                    </div>
+
+                    <button id="quizNextBtn" class="hidden w-full py-3 bg-gradient-to-r from-gold-champagne to-gold-hover text-emerald-deep font-semibold rounded-xl text-sm hover:shadow-lg transition-all">
+                        Следующий вопрос
+                    </button>
+                </div>
+
+                <div id="quizCompletedState" class="hidden text-center space-y-6 py-8">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gold-soft border-2 border-gold-champagne flex items-center justify-center text-gold-champagne">
+                        <i data-lucide="award" class="w-10 h-10"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-serif font-bold text-2xl text-emerald-deep dark:text-neutral-ivory">Тест успешно завершен!</h3>
+                        <p class="text-neutral-400 text-sm mt-1">Ваш итоговый показатель финансовой грамотности</p>
+                    </div>
+                    <div class="text-4xl font-serif font-bold text-gold-champagne" id="quizFinalScore">0%</div>
+                    <p id="quizFinalGrade" class="text-sm font-medium text-neutral-300 max-w-md mx-auto"></p>
+                    <button id="quizRestartBtn" class="px-6 py-3 bg-gradient-to-r from-gold-champagne to-gold-hover text-emerald-deep font-semibold rounded-xl text-sm shadow hover:shadow-lg transition-all inline-flex items-center gap-2">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Пройти тест заново
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modals -->
+    <!-- Modal: Add / Edit Goal -->
+    <div id="goalModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-neutral-cardDark w-full max-w-md rounded-2xl p-6 border border-neutral-borderLight dark:border-neutral-borderDark shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-neutral-borderLight dark:border-neutral-borderDark pb-3">
+                <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory" id="goalModalTitle">Новая цель</h3>
+                <button id="closeGoalModalBtn" class="text-neutral-400 hover:text-neutral-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="goalForm" class="space-y-4">
+                <input type="hidden" id="goalId">
+                <div>
+                    <label class="block text-xs font-medium text-neutral-400 mb-1">Название цели</label>
+                    <input type="text" id="goalTitle" placeholder="например: Квартира у парка" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-neutral-400 mb-1">Целевая сумма (<span class="currency-symbol">UZS</span>)</label>
+                    <input type="number" id="goalTarget" placeholder="например: 100000000" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-neutral-400 mb-1">Текущие накопления (<span class="currency-symbol">UZS</span>)</label>
+                    <input type="number" id="goalCurrent" placeholder="например: 25000000" class="w-full bg-neutral-bodyLight dark:bg-emerald-forest border border-neutral-borderLight dark:border-neutral-borderDark text-sm px-4 py-2 rounded-xl focus:outline-none focus:border-gold-champagne" required>
+                </div>
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-gold-champagne to-gold-hover text-emerald-deep font-semibold rounded-xl text-sm shadow hover:shadow-lg transition-all">Сохранить цель</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: About FINORA -->
+    <div id="aboutModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-neutral-cardDark w-full max-w-lg rounded-2xl p-6 border border-neutral-borderLight dark:border-neutral-borderDark shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-neutral-borderLight dark:border-neutral-borderDark pb-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-7 h-7 rounded-lg bg-gold-champagne flex items-center justify-center font-serif font-bold text-emerald-deep text-sm">F</div>
+                    <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory">О проекте FINORA</h3>
+                </div>
+                <button id="closeAboutModalBtn" class="text-neutral-400 hover:text-neutral-200"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="space-y-3 text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                <p><strong class="text-gold-champagne">FINORA — Personal Finance Studio</strong> — это интерактивная обучающая экосистема управления личным капиталом, разработанная в премиальном швейцарском стиле (Swiss Minimalist Fintech).</p>
+                <p>Приложение помогает развивать финансовую дисциплину, планировать доходы и расходы, управлять целями и моделировать сложный процент.</p>
+                <div class="p-3 bg-neutral-bodyLight dark:bg-emerald-forest rounded-xl border border-neutral-borderLight dark:border-neutral-borderDark space-y-1">
+                    <div class="font-semibold text-neutral-400 uppercase text-[10px]">Технологии</div>
+                    <div>Single-file HTML5, Vanilla JavaScript (ES6+), Tailwind CSS CDN, Chart.js, Lucide Icons & LocalStorage.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Academy Article Viewer -->
+    <div id="academyModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-neutral-cardDark w-full max-w-2xl rounded-2xl p-6 sm:p-8 border border-neutral-borderLight dark:border-neutral-borderDark shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-neutral-borderLight dark:border-neutral-borderDark pb-4">
+                <h3 class="font-serif font-bold text-2xl text-gold-champagne" id="academyModalTitle"></h3>
+                <button id="closeAcademyModalBtn" class="text-neutral-400 hover:text-neutral-200"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            <div id="academyModalContent" class="space-y-4 text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed"></div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           FINORA APPLICATION STATE & ENGINE (RUSSIAN LOCALIZATION)
+           ========================================================================== */
+
+        const EXCHANGE_RATES = {
+            UZS: 1,
+            USD: 1 / 12800,
+            EUR: 1 / 13900
+        };
+
+        const CURRENCY_SYMBOLS = {
+            UZS: "сум",
+            USD: "$",
+            EUR: "€"
+        };
+
+        const CATEGORY_NAMES_RU = {
+            'Housing': 'Жилье',
+            'Groceries': 'Продукты',
+            'Transport': 'Транспорт',
+            'Restaurants': 'Рестораны',
+            'Shopping': 'Покупки',
+            'Entertainment': 'Развлечения',
+            'Education': 'Образование',
+            'Health': 'Здоровье',
+            'Other': 'Прочее'
+        };
+
+        const INITIAL_STATE = {
+            currency: 'UZS',
+            theme: 'dark',
+            monthlyIncome: 15000000,
+            expenses: [
+                { id: '1', category: 'Housing', amount: 3500000, desc: 'Аренда квартиры и ЖКХ', date: '2026-03-01' },
+                { id: '2', category: 'Groceries', amount: 2000000, desc: 'Продукты в супермаркете Korzinka', date: '2026-03-03' },
+                { id: '3', category: 'Transport', amount: 800000, desc: 'Заправка авто и Яндекс Такси', date: '2026-03-05' },
+                { id: '4', category: 'Restaurants', amount: 1200000, desc: 'Семейный ужин в выходные', date: '2026-03-08' },
+                { id: '5', category: 'Shopping', amount: 600000, desc: 'Весенний гардероб', date: '2026-03-10' },
+                { id: '6', category: 'Entertainment', amount: 400000, desc: 'Билеты в кино и концерт', date: '2026-03-12' }
+            ],
+            savingsGoals: [
+                { id: 'g1', title: 'Финансовая подушка', target: 25000000, current: 15000000 },
+                { id: 'g2', title: 'Новый автомобиль', target: 120000000, current: 35000000 },
+                { id: 'g3', title: 'Отпуск у моря', target: 15000000, current: 8000000 }
+            ]
+        };
+
+        let state = JSON.parse(localStorage.getItem('FINORA_STATE')) || INITIAL_STATE;
+
+        function saveState() {
+            localStorage.setItem('FINORA_STATE', JSON.stringify(state));
+            renderAll();
+        }
+
+        function formatCurrency(amountUZS) {
+            const converted = amountUZS * EXCHANGE_RATES[state.currency];
+            const symbol = CURRENCY_SYMBOLS[state.currency];
+            
+            if (state.currency === 'UZS') {
+                return Math.round(converted).toLocaleString('ru-RU') + ' UZS';
+            } else {
+                return symbol + converted.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+        }
+
+        let cashflowChartInstance = null;
+        let expenseStructureChartInstance = null;
+        let expensesBarChartInstance = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            applyTheme(state.theme);
+            initNavigation();
+            initEventListeners();
+            initQuiz();
+            renderAcademy();
+            renderAll();
+        });
+
+        function applyTheme(theme) {
+            state.theme = theme;
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('FINORA_STATE', JSON.stringify(state));
+        }
+
+        function initNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = link.getAttribute('data-page');
+                    navigateTo(page);
+                });
+            });
+
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('-translate-x-full');
+                sidebarOverlay.classList.toggle('hidden');
+            }
+
+            if(mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleSidebar);
+            if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
+            if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+        }
+
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('page-transition');
+            }
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('text-gold-champagne', 'bg-gold-soft', 'font-semibold', 'border-l-4', 'border-gold-champagne');
+                    link.classList.remove('text-neutral-600', 'dark:text-neutral-300');
+                } else {
+                    link.classList.remove('text-gold-champagne', 'bg-gold-soft', 'font-semibold', 'border-l-4', 'border-gold-champagne');
+                    link.classList.add('text-neutral-600', 'dark:text-neutral-300');
+                }
+            });
+
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            }
+
+            setTimeout(() => {
+                renderCharts();
+            }, 100);
+        }
+
+        function initEventListeners() {
+            const currencySelect = document.getElementById('currencySelect');
+            currencySelect.value = state.currency;
+            currencySelect.addEventListener('change', (e) => {
+                state.currency = e.target.value;
+                saveState();
+            });
+
+            document.getElementById('themeToggleBtn').addEventListener('click', () => {
+                const newTheme = state.theme === 'dark' ? 'light' : 'dark';
+                applyTheme(newTheme);
+            });
+
+            document.getElementById('resetDataBtn').addEventListener('click', () => {
+                if (confirm('Вы уверены, что хотите сбросить все данные до демо-значений?')) {
+                    state = JSON.parse(JSON.stringify(INITIAL_STATE));
+                    saveState();
+                }
+            });
+
+            const budgetIncomeInput = document.getElementById('budgetIncomeInput');
+            budgetIncomeInput.value = state.monthlyIncome;
+            budgetIncomeInput.addEventListener('input', (e) => {
+                state.monthlyIncome = Number(e.target.value) || 0;
+                saveState();
+            });
+
+            document.getElementById('addExpenseForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const category = document.getElementById('expenseCategory').value;
+                const amount = Number(document.getElementById('expenseAmount').value);
+                const desc = document.getElementById('expenseDesc').value;
+                const date = document.getElementById('expenseDate').value;
+
+                if (amount > 0 && desc && date) {
+                    const newExpense = {
+                        id: Date.now().toString(),
+                        category,
+                        amount,
+                        desc,
+                        date
+                    };
+                    state.expenses.unshift(newExpense);
+                    saveState();
+
+                    document.getElementById('expenseAmount').value = '';
+                    document.getElementById('expenseDesc').value = '';
+                }
+            });
+
+            document.querySelectorAll('.calc-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.calc-tab-btn').forEach(b => {
+                        b.classList.remove('text-gold-champagne', 'bg-gold-soft', 'border', 'border-gold-champagne/30');
+                        b.classList.add('text-neutral-500');
+                    });
+                    btn.classList.add('text-gold-champagne', 'bg-gold-soft', 'border', 'border-gold-champagne/30');
+                    btn.classList.remove('text-neutral-500');
+
+                    const targetTab = btn.getAttribute('data-calc-tab');
+                    document.querySelectorAll('.calc-tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById(`calcTab-${targetTab}`).classList.remove('hidden');
+                });
+            });
+
+            ['savInitial', 'savMonthly', 'savRate', 'savMonths'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateSavingsCalc);
+            });
+            ['compPrincipal', 'compRate', 'compYears', 'compFreq'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateCompoundCalc);
+            });
+            document.getElementById('b50Income').addEventListener('input', update503020Calc);
+            ['loanAmount', 'loanRate', 'loanMonths'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateLoanCalc);
+            });
+
+            document.getElementById('openAddGoalModalBtn').addEventListener('click', () => openGoalModal());
+            document.getElementById('closeGoalModalBtn').addEventListener('click', () => closeGoalModal());
+            document.getElementById('goalForm').addEventListener('submit', saveGoalHandler);
+
+            document.getElementById('openAboutBtn').addEventListener('click', () => {
+                document.getElementById('aboutModal').classList.remove('hidden');
+            });
+            document.getElementById('closeAboutModalBtn').addEventListener('click', () => {
+                document.getElementById('aboutModal').classList.add('hidden');
+            });
+            document.getElementById('closeAcademyModalBtn').addEventListener('click', () => {
+                document.getElementById('academyModal').classList.add('hidden');
+            });
+        }
+
+        function renderAll() {
+            document.querySelectorAll('.currency-symbol').forEach(el => {
+                el.innerText = CURRENCY_SYMBOLS[state.currency];
+            });
+            const incomeCurrencyLabel = document.getElementById('incomeCurrencyLabel');
+            if (incomeCurrencyLabel) incomeCurrencyLabel.innerText = CURRENCY_SYMBOLS[state.currency];
+
+            renderOverview();
+            renderBudget();
+            renderExpensesAnalysis();
+            renderSavingsGoals();
+            updateSavingsCalc();
+            updateCompoundCalc();
+            update503020Calc();
+            updateLoanCalc();
+            renderCharts();
+        }
+
+        /* 1. OVERVIEW ENGINE */
+        function renderOverview() {
+            const totalExpenses = state.expenses.reduce((sum, item) => sum + item.amount, 0);
+            const totalSavings = state.savingsGoals.reduce((sum, goal) => sum + goal.current, 0);
+            const balance = state.monthlyIncome - totalExpenses + totalSavings;
+
+            document.getElementById('overviewBalance').innerText = formatCurrency(balance);
+            document.getElementById('overviewIncome').innerText = formatCurrency(state.monthlyIncome);
+            document.getElementById('overviewExpenses').innerText = formatCurrency(totalExpenses);
+            document.getElementById('overviewSavings').innerText = formatCurrency(totalSavings);
+
+            const expRatio = state.monthlyIncome > 0 ? Math.round((totalExpenses / state.monthlyIncome) * 100) : 0;
+            document.getElementById('overviewExpenseRatio').innerText = `${expRatio}% от дохода`;
+
+            const insightsContainer = document.getElementById('insightsContainer');
+            let insight1 = "", insight2 = "", insight3 = "";
+
+            if (expRatio > 70) {
+                insight1 = `<div class="p-3 bg-rose-500/10 rounded-xl border border-rose-500/20 text-rose-300">⚠️ <strong>Высокие расходы:</strong> Ваши траты превышают 70% дохода. Рекомендуем пересмотреть необязательные статьи расходов.</div>`;
+            } else {
+                insight1 = `<div class="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-emerald-300">✅ <strong>Здоровый баланс:</strong> Расходы находятся в пределах нормы. Вы эффективно управляете бюджетом.</div>`;
+            }
+
+            const totalGoalTargets = state.savingsGoals.reduce((sum, g) => sum + g.target, 0);
+            const savingsProgress = totalGoalTargets > 0 ? Math.round((totalSavings / totalGoalTargets) * 100) : 0;
+            insight2 = `<div class="p-3 bg-gold-soft rounded-xl border border-gold-champagne/30 text-gold-champagne">🎯 <strong>Прогресс по целям:</strong> Вы накопили ${savingsProgress}% от общего целевого ориентира.</div>`;
+
+            const emergencyGoal = state.savingsGoals.find(g => g.title.toLowerCase().includes('подушка') || g.title.toLowerCase().includes('emergency'));
+            if (emergencyGoal && emergencyGoal.current >= state.monthlyIncome * 3) {
+                insight3 = `<div class="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 text-blue-300">🛡️ <strong>Подушка безопасности:</strong> Ваших накоплений хватит более чем на 3 месяца жизни при форс-мажорах.</div>`;
+            } else {
+                insight3 = `<div class="p-3 bg-neutral-cardDark rounded-xl border border-neutral-borderDark text-neutral-300">💡 <strong>Совет:</strong> Стремитесь сформировать неприкосновенный резерв на 3–6 месяцев обязательных трат.</div>`;
+            }
+
+            insightsContainer.innerHTML = insight1 + insight2 + insight3;
+        }
+
+        /* 2. BUDGET ENGINE */
+        function renderBudget() {
+            const totalSpent = state.expenses.reduce((sum, item) => sum + item.amount, 0);
+            const remaining = state.monthlyIncome - totalSpent;
+            const savingsRate = state.monthlyIncome > 0 ? Math.max(0, Math.round((remaining / state.monthlyIncome) * 100)) : 0;
+
+            document.getElementById('budgetTotalSpent').innerText = formatCurrency(totalSpent);
+            document.getElementById('budgetRemaining').innerText = formatCurrency(remaining);
+            document.getElementById('budgetSavingsRate').innerText = `${savingsRate}%`;
+
+            const tbody = document.getElementById('budgetTableBody');
+            tbody.innerHTML = '';
+
+            if (state.expenses.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-neutral-400">Список расходов пуст. Добавьте первую операцию выше!</td></tr>`;
+                return;
+            }
+
+            state.expenses.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-neutral-bodyLight dark:hover:bg-emerald-forest/30 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-2 font-medium">${CATEGORY_NAMES_RU[item.category] || item.category}</td>
+                    <td class="py-3 px-2 text-neutral-400">${item.desc}</td>
+                    <td class="py-3 px-2 text-neutral-400 text-xs">${item.date}</td>
+                    <td class="py-3 px-2 text-right font-semibold text-rose-400">${formatCurrency(item.amount)}</td>
+                    <td class="py-3 px-2 text-center">
+                        <button onclick="deleteExpense('${item.id}')" class="p-1 rounded text-rose-400 hover:bg-rose-500/10 transition-colors">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function deleteExpense(id) {
+            state.expenses = state.expenses.filter(item => item.id !== id);
+            saveState();
+        }
+
+        /* 3. EXPENSES ANALYSIS ENGINE */
+        function renderExpensesAnalysis() {
+            const totalSpent = state.expenses.reduce((sum, item) => sum + item.amount, 0);
+            document.getElementById('expTotalAmount').innerText = formatCurrency(totalSpent);
+            document.getElementById('expTotalCount').innerText = `${state.expenses.length} всего записей`;
+
+            const average = state.expenses.length > 0 ? totalSpent / state.expenses.length : 0;
+            document.getElementById('expAverage').innerText = formatCurrency(average);
+
+            const catMap = {};
+            state.expenses.forEach(item => {
+                catMap[item.category] = (catMap[item.category] || 0) + item.amount;
+            });
+
+            let highestCat = '-';
+            let highestVal = 0;
+            for (const [cat, val] of Object.entries(catMap)) {
+                if (val > highestVal) {
+                    highestVal = val;
+                    highestCat = CATEGORY_NAMES_RU[cat] || cat;
+                }
+            }
+            document.getElementById('expHighestCategory').innerText = highestCat;
+            document.getElementById('expHighestCategoryAmount').innerText = `${formatCurrency(highestVal)} потрачено`;
+
+            const listContainer = document.getElementById('expensesCategoryList');
+            listContainer.innerHTML = '';
+
+            const categories = ['Housing', 'Groceries', 'Transport', 'Restaurants', 'Shopping', 'Entertainment', 'Education', 'Health', 'Other'];
+            categories.forEach(cat => {
+                const amount = catMap[cat] || 0;
+                const pct = totalSpent > 0 ? Math.round((amount / totalSpent) * 100) : 0;
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "space-y-1";
+                itemDiv.innerHTML = `
+                    <div class="flex justify-between text-xs font-medium">
+                        <span class="text-neutral-300">${CATEGORY_NAMES_RU[cat] || cat}</span>
+                        <span class="text-gold-champagne">${formatCurrency(amount)} (${pct}%)</span>
+                    </div>
+                    <div class="w-full h-2 bg-neutral-bodyLight dark:bg-emerald-forest rounded-full overflow-hidden">
+                        <div class="h-full bg-gold-champagne rounded-full transition-all duration-500" style="width: ${pct}%;"></div>
+                    </div>
+                `;
+                listContainer.appendChild(itemDiv);
+            });
+        }
+
+        /* 4. SAVINGS GOALS ENGINE */
+        function renderSavingsGoals() {
+            const container = document.getElementById('savingsGoalsContainer');
+            container.innerHTML = '';
+
+            state.savingsGoals.forEach(goal => {
+                const pct = Math.min(100, Math.round((goal.current / goal.target) * 100));
+                const remaining = Math.max(0, goal.target - goal.current);
+                const monthlyRequired = Math.round(remaining / 12);
+
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm flex flex-col justify-between space-y-4 hover:border-gold-champagne/40 transition-all";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory">${goal.title}</h3>
+                            <div class="flex items-center space-x-1">
+                                <button onclick="openGoalModal('${goal.id}')" class="p-1 rounded text-neutral-400 hover:text-gold-champagne"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                <button onclick="deleteGoal('${goal.id}')" class="p-1 rounded text-neutral-400 hover:text-rose-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div class="text-2xl font-serif font-bold text-gold-champagne">${formatCurrency(goal.current)}</div>
+                        <div class="text-xs text-neutral-400 mt-1">Цель: ${formatCurrency(goal.target)}</div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span class="text-neutral-400">Прогресс</span>
+                            <span class="text-gold-champagne">${pct}%</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-neutral-bodyLight dark:bg-emerald-forest rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-gold-champagne to-gold-hover rounded-full transition-all duration-500" style="width: ${pct}%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-neutral-borderLight dark:border-neutral-borderDark flex items-center justify-between text-xs">
+                        <span class="text-neutral-400">Пополнять на ${formatCurrency(monthlyRequired)}/мес в течение 1 года</span>
+                        <button onclick="depositGoalPrompt('${goal.id}')" class="px-3 py-1.5 bg-gold-soft border border-gold-champagne/30 text-gold-champagne font-semibold rounded-lg hover:bg-gold-champagne hover:text-emerald-deep transition-all">+ Пополнить</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function openGoalModal(goalId = null) {
+            const modal = document.getElementById('goalModal');
+            const title = document.getElementById('goalModalTitle');
+            modal.classList.remove('hidden');
+
+            if (goalId) {
+                const goal = state.savingsGoals.find(g => g.id === goalId);
+                title.innerText = 'Редактировать цель';
+                document.getElementById('goalId').value = goal.id;
+                document.getElementById('goalTitle').value = goal.title;
+                document.getElementById('goalTarget').value = goal.target;
+                document.getElementById('goalCurrent').value = goal.current;
+            } else {
+                title.innerText = 'Новая финансовая цель';
+                document.getElementById('goalId').value = '';
+                document.getElementById('goalTitle').value = '';
+                document.getElementById('goalTarget').value = '';
+                document.getElementById('goalCurrent').value = '';
+            }
+        }
+
+        function closeGoalModal() {
+            document.getElementById('goalModal').classList.add('hidden');
+        }
+
+        function saveGoalHandler(e) {
+            e.preventDefault();
+            const id = document.getElementById('goalId').value;
+            const title = document.getElementById('goalTitle').value;
+            const target = Number(document.getElementById('goalTarget').value);
+            const current = Number(document.getElementById('goalCurrent').value);
+
+            if (id) {
+                const goal = state.savingsGoals.find(g => g.id === id);
+                if (goal) {
+                    goal.title = title;
+                    goal.target = target;
+                    goal.current = current;
+                }
+            } else {
+                state.savingsGoals.push({
+                    id: Date.now().toString(),
+                    title,
+                    target,
+                    current
+                });
+            }
+            closeGoalModal();
+            saveState();
+        }
+
+        function deleteGoal(id) {
+            state.savingsGoals = state.savingsGoals.filter(g => g.id !== id);
+            saveState();
+        }
+
+        function depositGoalPrompt(id) {
+            const goal = state.savingsGoals.find(g => g.id === id);
+            if (!goal) return;
+            const amountStr = prompt(`Введите сумму пополнения цели "${goal.title}" (${CURRENCY_SYMBOLS[state.currency]}):`);
+            if (amountStr) {
+                const amount = Number(amountStr);
+                if (!isNaN(amount) && amount > 0) {
+                    const amountUZS = amount / EXCHANGE_RATES[state.currency];
+                    goal.current += amountUZS;
+                    saveState();
+                }
+            }
+        }
+
+        /* 5. CALCULATORS ENGINE */
+        function updateSavingsCalc() {
+            const P = Number(document.getElementById('savInitial').value) || 0;
+            const PMT = Number(document.getElementById('savMonthly').value) || 0;
+            const r = (Number(document.getElementById('savRate').value) || 0) / 100 / 12;
+            const n = Number(document.getElementById('savMonths').value) || 0;
+
+            let totalDeposits = P + (PMT * n);
+            let totalFV = P * Math.pow(1 + r, n);
+
+            for (let i = 1; i <= n; i++) {
+                totalFV += PMT * Math.pow(1 + r, n - i);
+            }
+
+            const interestEarned = Math.max(0, totalFV - totalDeposits);
+
+            document.getElementById('savResultDeposits').innerText = formatCurrency(totalDeposits);
+            document.getElementById('savResultInterest').innerText = formatCurrency(interestEarned);
+            document.getElementById('savResultTotal').innerText = formatCurrency(totalFV);
+        }
+
+        function updateCompoundCalc() {
+            const P = Number(document.getElementById('compPrincipal').value) || 0;
+            const r = (Number(document.getElementById('compRate').value) || 0) / 100;
+            const t = Number(document.getElementById('compYears').value) || 0;
+            const n = Number(document.getElementById('compFreq').value) || 12;
+
+            const A = P * Math.pow(1 + (r / n), n * t);
+            const multiplier = P > 0 ? (A / P).toFixed(2) : '0';
+
+            document.getElementById('compResultPrincipal').innerText = formatCurrency(P);
+            document.getElementById('compResultTotal').innerText = formatCurrency(A);
+            document.getElementById('compResultMultiplier').innerText = `${multiplier}x`;
+        }
+
+        function update503020Calc() {
+            const income = Number(document.getElementById('b50Income').value) || 0;
+            const needs = income * 0.50;
+            const wants = income * 0.30;
+            const savings = income * 0.20;
+
+            document.getElementById('b50Needs').innerText = formatCurrency(needs);
+            document.getElementById('b50Wants').innerText = formatCurrency(wants);
+            document.getElementById('b50Savings').innerText = formatCurrency(savings);
+        }
+
+        function updateLoanCalc() {
+            const P = Number(document.getElementById('loanAmount').value) || 0;
+            const annualRate = Number(document.getElementById('loanRate').value) || 0;
+            const r = annualRate / 100 / 12;
+            const n = Number(document.getElementById('loanMonths').value) || 1;
+
+            let monthlyPayment = 0;
+            if (r > 0) {
+                monthlyPayment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            } else {
+                monthlyPayment = P / n;
+            }
+
+            const totalPayout = monthlyPayment * n;
+            const overpayment = Math.max(0, totalPayout - P);
+
+            document.getElementById('loanMonthly').innerText = formatCurrency(monthlyPayment);
+            document.getElementById('loanTotal').innerText = formatCurrency(totalPayout);
+            document.getElementById('loanOverpayment').innerText = formatCurrency(overpayment);
+        }
+
+        /* 6. FINANCIAL ACADEMY ENGINE (7 MODULES IN RUSSIAN) */
+        const ACADEMY_ARTICLES = [
+            {
+                id: '1',
+                title: 'Личный бюджет (50/30/20)',
+                icon: 'wallet',
+                desc: 'Правило грамотного распределения доходов и управления расходами.',
+                content: `
+                    <p>Бюджетирование — это основа финансовой независимости. Наглядный метод 50/30/20 позволяет разумно балансировать между текущими потребностями и будущим капиталом.</p>
+                    <h4 class="font-bold text-gold-champagne mt-3">Структура золотого правила:</h4>
+                    <ul class="list-disc pl-5 space-y-1 my-2">
+                        <li><strong>50% — Обязательные расходы:</strong> Аренда, коммуналка, продукты, транспорт (напр. 7 500 000 UZS при доходе 15 000 000 UZS).</li>
+                        <li><strong>30% — Желания и комфорт:</strong> Кафе, отдых, покупки, шопинг (4 500 000 UZS).</li>
+                        <li><strong>20% — Финансовое будущее:</strong> Инвестиции, погашение долгов и подушка безопасности (3 000 000 UZS).</li>
+                    </ul>
+                `
+            },
+            {
+                id: '2',
+                title: 'Финансовая подушка безопасности',
+                icon: 'shield-alert',
+                desc: 'Зачем нужен неприкосновенный резерв и как правильно его сформировать.',
+                content: `
+                    <p>Подушка безопасности — это ликвидный денежный резерв, предназначенный исключительно для непредвиденных ситуаций (потеря работы, болезнь, срочный ремонт).</p>
+                    <h4 class="font-bold text-gold-champagne mt-3">Размер резерва:</h4>
+                    <p>Оптимальный объем составляет от 3 до 6 месяцев вашей базовой стоимости жизни.</p>
+                    <p class="mt-2"><strong>Пример:</strong> Если базовые расходы составляют 6 000 000 UZS в месяц, целевой размер подушки — от 18 000 000 до 36 000 000 UZS на доступном банковском депозите.</p>
+                `
+            },
+            {
+                id: '3',
+                title: 'Инфляция и покупательная способность',
+                icon: 'trending-down',
+                desc: 'Как обесцениваются деньги, лежащие без дела «под подушкой».',
+                content: `
+                    <p>Инфляция — это незаметное снижение покупательной способности денег. Деньги, хранящиеся в наличных, каждый год теряют реальную ценность.</p>
+                    <h4 class="font-bold text-gold-champagne mt-3">Наглядный пример:</h4>
+                    <p>При официальной инфляции 10% в год сумма в 10 000 000 UZS через год сможет купить лишь столько же товаров, сколько сегодня можно купить на 9 000 000 UZS.</p>
+                    <p class="mt-2">Чтобы защитить капитал, доходность ваших сбережений должна превышать процент инфляции.</p>
+                `
+            },
+            {
+                id: '4',
+                title: 'Сила сложного процента',
+                icon: 'sparkles',
+                desc: 'Восьмое чудо света: как проценты на проценты создают состояние.',
+                content: `
+                    <p>Сложный процент — это процент, начисляемый на первоначальный капитал и на ранее накопленные проценты.</p>
+                    <h4 class="font-bold text-gold-champagne mt-3">Эффект времени:</h4>
+                    <p>Откладывая по 1 000 000 UZS каждый месяц под 18% годовых, через 10 лет вы получите сумму, значительно превышающую просто отложенные наличные за счет постоянной капитализации дохода.</p>
+                `
+            },
+            {
+                id: '5',
+                title: 'Основы инвестирования',
+                icon: 'line-chart',
+                desc: 'Диверсификация, горизонт планирования и управление рисками.',
+                content: `
+                    <p>Инвестиции — это инструмент заставить капитал работать на вас и приносить пассивный доход.</p>
+                    <h4 class="font-bold text-gold-champagne mt-3">Главные принципы:</h4>
+                    <ul class="list-disc pl-5 space-y-1 my-2">
+                        <li><strong>Диверсификация:</strong> Не кладите все яйца в одну корзину (акции, облигации, депозиты, недвижимость).</li>
+                        <li><strong>Риск и доходность:</strong> Чем выше потенциальная прибыль, тем выше риск.</li>
+                        <li><strong>Горизонт:</strong> Долгосрочное присутствие на рынке всегда выигрывает у попыток угадать лучший момент.</li>
+                    </ul>
+                `
+            },
+            {
+                id: '6',
+                title: 'Управление долгами и кредитами',
+                icon: 'credit-card',
+                desc: 'Разница между «плохими» и «хорошими» долгами и методы их погашения.',
+                content: `
+                    <p>Разделяйте долги на <strong>хорошие</strong> (кредиты на активы, увеличивающие ваш доход или капитал) и <strong>плохие</strong> (высокопроцентные потребительские займы на электронику и развлечения).</p>
+                    <h4 class="font-bold text-gold-champagne mt-3">Метод «Лавина»:</h4>
+                    <p>Первоначально закрывайте долги с самой высокой процентной ставкой. Это экономит максимальное количество ваших денег на переплате.</p>
+                `
+            },
+            {
+                id: '7',
+                title: 'Финансовая дисциплина и привычки',
+                icon: 'target',
+                desc: 'Как выстроить систему регулярных сбережений и избавиться от импульсивных трат.',
+                content: `
+                    <p>Финансовая дисциплина — это навык сначала «платить себе» (откладывать 10–20% от любого дохода) и лишь затем распределять оставшиеся средства.</p>
+                    <h4 class="font-bold text-gold-champagne mt-3">Совет по автоматизации:</h4>
+                    <p>Настройте автоперевод 10% от зарплаты на накопительный счет сразу в день получения дохода.</p>
+                `
+            }
+        ];
+
+        function renderAcademy() {
+            const grid = document.getElementById('academyGrid');
+            grid.innerHTML = '';
+
+            ACADEMY_ARTICLES.forEach(art => {
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-neutral-cardDark p-6 rounded-2xl border border-neutral-borderLight dark:border-neutral-borderDark shadow-sm hover:border-gold-champagne/40 transition-all flex flex-col justify-between space-y-4 cursor-pointer";
+                card.onclick = () => openAcademyModal(art.id);
+
+                card.innerHTML = `
+                    <div>
+                        <div class="p-3 rounded-xl bg-gold-soft text-gold-champagne w-fit mb-4">
+                            <i data-lucide="${art.icon}" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-serif font-bold text-lg text-emerald-deep dark:text-neutral-ivory mb-2">${art.title}</h3>
+                        <p class="text-xs text-neutral-400 leading-relaxed">${art.desc}</p>
+                    </div>
+                    <div class="text-xs font-semibold text-gold-champagne flex items-center gap-1 pt-2">
+                        Читать руководство <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function openAcademyModal(id) {
+            const article = ACADEMY_ARTICLES.find(a => a.id === id);
+            if (!article) return;
+
+            document.getElementById('academyModalTitle').innerText = article.title;
+            document.getElementById('academyModalContent').innerHTML = article.content;
+            document.getElementById('academyModal').classList.remove('hidden');
+        }
+
+        /* 7. KNOWLEDGE QUIZ ENGINE (10 QUESTIONS IN RUSSIAN) */
+        const QUIZ_QUESTIONS = [
+            {
+                q: "Что обозначает 50% в популярном правиле бюджетирования 50/30/20?",
+                options: ["Накопления и инвестиции", "Обязательные базовые нужды и счета", "Развлечения и путешествия", "Импульсивные покупки"],
+                answer: 1,
+                explanation: "50% вашего чистого дохода должны покрывать основные жизненные потребности: жилье, коммуналка, еда и базовый транспорт."
+            },
+            {
+                q: "Каким должен быть оптимальный размер финансовой подушки безопасности?",
+                options: ["Зарплата за 1 неделю", "Расходы на 1 месяц развлечений", "От 3 до 6 месяцев обязательных расходов", "Доход за 10 лет"],
+                answer: 2,
+                explanation: "Финансовые эксперты советуют хранить резерв на 3–6 месяцев обязательных расходов для защиты при форс-мажорах."
+            },
+            {
+                q: "В чем заключается главное негативное влияние инфляции на сбережения?",
+                options: ["Увеличивает покупки", "Постепенно снижает реальную покупательную способность денег", "Не влияет на наличные", "Удваивает депозиты автоматически"],
+                answer: 1,
+                explanation: "Инфляция со временем обесценивает деньги — на ту же сумму наличных вы сможете купить меньше товаров."
+            },
+            {
+                q: "Что такое сложный процент?",
+                options: ["Процент, начисляемый только на первоначальный взнос", "Процент, начисляемый на основной капитал и на ранее начисленные проценты", "Комиссия банка за снятие денег", "Штраф за просрочку платежа"],
+                answer: 1,
+                explanation: "Сложный процент дает экспоненциальный рост капитала, поскольку полученные проценты повторно приносят доход."
+            },
+            {
+                q: "Что такое аннуитетный платеж по кредиту?",
+                options: ["Равные ежемесячные платежи на протяжении всего срока кредита", "Выплата только процентов без гашения основного долга", "Выплата всей суммы в первый же день", "Произвольный плавающий платеж"],
+                answer: 0,
+                explanation: "При аннуитете заемщик вносит одинаковую фиксированную сумму каждый месяц."
+            },
+            {
+                q: "Какой актив считается наиболее ликвидным?",
+                options: ["Коммерческая недвижимость", "Деньги на банковском счете / в наличных", "Коллекционное искусство", "Акции непубличных стартапов"],
+                answer: 1,
+                explanation: "Ликвидность — это скорость превращения актива в деньги без потери стоимости. Деньги на счете — самый ликвидный актив."
+            },
+            {
+                q: "Для чего применяется диверсификация инвестиционного портфеля?",
+                options: ["Для 100% гарантии прибыли", "Для распределения рисков и снижения общей волатильности портфеля", "Для уклонения от налогов", "Для увеличения кредитных ставок"],
+                answer: 1,
+                explanation: "Диверсификация защищает капитал: падение одного актива компенсируется стабильностью или ростом других."
+            },
+            {
+                q: "Что относится к понятию «Плохой долг»?",
+                options: ["Ипотека на дорожающее жилье", "Дорогой потребительский кредит на роскошь или гаджеты", "Низкопроцентный заём на обучение высокодоходной профессии", "Кредит на расширение прибыльного бизнеса"],
+                answer: 1,
+                explanation: "Плохие долги — это высокопроцентные займы на вещи, которые моментально теряют стоимость и не приносят дохода."
+            },
+            {
+                q: "Почему выгодно начинать инвестировать как можно раньше?",
+                options: ["Молодежи дают бесплатные подарки", "Время дает сложному проценту совершить больше циклов капитализации", "Инфляция исчезает в молодости", "Снимаются все налоги"],
+                answer: 1,
+                explanation: "Длительный горизонт времени усиливает эффект сложного процента, превращая небольшие регулярные взносы в серьезный капитал."
+            },
+            {
+                q: "Что такое «Чистая стоимость капитала» (Net Worth)?",
+                options: ["Ваш годовой оклад", "Сумма всех ваших Активов минус все Пассивы (долги)", "Сумма расходов за последний месяц", "Стоимость вашего автомобиля"],
+                answer: 1,
+                explanation: "Чистая стоимость — это разница между тем, чем вы владеете (активы), и тем, что вы должны (обязательства)."
+            }
+        ];
+
+        let quizIndex = 0;
+        let quizScore = 0;
+        let selectedOption = null;
+
+        function initQuiz() {
+            quizIndex = 0;
+            quizScore = 0;
+            renderQuizQuestion();
+
+            document.getElementById('quizNextBtn').addEventListener('click', nextQuizQuestion);
+            document.getElementById('quizRestartBtn').addEventListener('click', () => {
+                quizIndex = 0;
+                quizScore = 0;
+                document.getElementById('quizCompletedState').classList.add('hidden');
+                document.getElementById('quizActiveState').classList.remove('hidden');
+                renderQuizQuestion();
+            });
+        }
+
+        function renderQuizQuestion() {
+            const currentQ = QUIZ_QUESTIONS[quizIndex];
+            document.getElementById('quizProgressText').innerText = `Вопрос ${quizIndex + 1} из ${QUIZ_QUESTIONS.length}`;
+            document.getElementById('quizScoreTracker').innerText = `Баллы: ${quizScore}`;
+            document.getElementById('quizProgressBar').style.width = `${((quizIndex + 1) / QUIZ_QUESTIONS.length) * 100}%`;
+            document.getElementById('quizQuestion').innerText = currentQ.q;
+
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            document.getElementById('quizFeedback').classList.add('hidden');
+            document.getElementById('quizNextBtn').classList.add('hidden');
+            selectedOption = null;
+
+            currentQ.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border border-neutral-borderLight dark:border-neutral-borderDark bg-neutral-bodyLight dark:bg-emerald-forest/40 hover:border-gold-champagne/60 transition-all text-sm font-medium flex items-center justify-between";
+                btn.innerHTML = `<span>${opt}</span> <div class="w-5 h-5 rounded-full border border-neutral-400 flex items-center justify-center text-xs"></div>`;
+                btn.onclick = () => selectQuizOption(idx, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectQuizOption(idx, btnElement) {
+            if (selectedOption !== null) return;
+            selectedOption = idx;
+
+            const currentQ = QUIZ_QUESTIONS[quizIndex];
+            const feedback = document.getElementById('quizFeedback');
+            const allBtns = document.getElementById('quizOptions').children;
+
+            if (idx === currentQ.answer) {
+                quizScore++;
+                btnElement.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-400');
+                feedback.className = "p-4 rounded-xl text-sm border bg-emerald-500/10 border-emerald-500/30 text-emerald-300";
+                feedback.innerHTML = `<strong>✅ Верно!</strong> ${currentQ.explanation}`;
+            } else {
+                btnElement.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-400');
+                allBtns[currentQ.answer].classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-400');
+                feedback.className = "p-4 rounded-xl text-sm border bg-rose-500/10 border-rose-500/30 text-rose-300";
+                feedback.innerHTML = `<strong>❌ Неверно.</strong> ${currentQ.explanation}`;
+            }
+
+            feedback.classList.remove('hidden');
+            document.getElementById('quizNextBtn').classList.remove('hidden');
+            document.getElementById('quizScoreTracker').innerText = `Баллы: ${quizScore}`;
+        }
+
+        function nextQuizQuestion() {
+            quizIndex++;
+            if (quizIndex < QUIZ_QUESTIONS.length) {
+                renderQuizQuestion();
+            } else {
+                document.getElementById('quizActiveState').classList.add('hidden');
+                document.getElementById('quizCompletedState').classList.remove('hidden');
+
+                const pct = Math.round((quizScore / QUIZ_QUESTIONS.length) * 100);
+                document.getElementById('quizFinalScore').innerText = `${pct}% (${quizScore}/${QUIZ_QUESTIONS.length})`;
+
+                let grade = "";
+                if (pct >= 80) grade = "🏆 Отличный результат! Вы превосходно разбираетесь в управлении личным капиталом.";
+                else if (pct >= 60) grade = "👍 Хорошие знания! Изучите материалы в Академии, чтобы устранить небольшие пробелы.";
+                else grade = "📚 Рекомендуем пройти уроки в Академии FINORA и повторить попытку тесте!";
+
+                document.getElementById('quizFinalGrade').innerText = grade;
+            }
+        }
+
+        /* 8. CHART.JS VISUALIZATIONS ENGINE */
+        function renderCharts() {
+            const isDark = state.theme === 'dark';
+            const textColor = isDark ? '#F5F2EA' : '#252A27';
+            const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+
+            // Line Chart
+            const cashCtx = document.getElementById('cashflowChart')?.getContext('2d');
+            if (cashCtx) {
+                if (cashflowChartInstance) cashflowChartInstance.destroy();
+
+                const months = ['Окт', 'Ноя', 'Дек', 'Янв', 'Фев', 'Мар'];
+                const incomeData = [14000000, 14500000, 15000000, 15000000, 15500000, state.monthlyIncome];
+                const totalSpent = state.expenses.reduce((s, i) => s + i.amount, 0);
+                const expenseData = [8000000, 8200000, 9000000, 8100000, 8400000, totalSpent];
+
+                cashflowChartInstance = new Chart(cashCtx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [
+                            {
+                                label: 'Доходы',
+                                data: incomeData,
+                                borderColor: '#C5A46D',
+                                backgroundColor: 'rgba(197, 164, 109, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Расходы',
+                                data: expenseData,
+                                borderColor: '#F87171',
+                                backgroundColor: 'rgba(248, 113, 113, 0.05)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                            y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                        }
+                    }
+                });
+            }
+
+            // Donut Chart
+            const structCtx = document.getElementById('expenseStructureChart')?.getContext('2d');
+            if (structCtx) {
+                if (expenseStructureChartInstance) expenseStructureChartInstance.destroy();
+
+                const catMap = {};
+                state.expenses.forEach(i => {
+                    const catName = CATEGORY_NAMES_RU[i.category] || i.category;
+                    catMap[catName] = (catMap[catName] || 0) + i.amount;
+                });
+
+                const labels = Object.keys(catMap).length ? Object.keys(catMap) : ['Нет данных'];
+                const data = Object.keys(catMap).length ? Object.values(catMap) : [1];
+
+                expenseStructureChartInstance = new Chart(structCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: ['#C5A46D', '#203A30', '#60A5FA', '#F87171', '#A78BFA', '#F59E0B', '#34D399']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        cutout: '70%'
+                    }
+                });
+            }
+
+            // Bar Chart
+            const barCtx = document.getElementById('expensesBarChart')?.getContext('2d');
+            if (barCtx) {
+                if (expensesBarChartInstance) expensesBarChartInstance.destroy();
+
+                const categories = ['Housing', 'Groceries', 'Transport', 'Restaurants', 'Shopping', 'Entertainment', 'Education', 'Health', 'Other'];
+                const catMap = {};
+                state.expenses.forEach(i => catMap[i.category] = (catMap[i.category] || 0) + i.amount);
+                
+                const labelsRU = categories.map(c => CATEGORY_NAMES_RU[c]);
+                const values = categories.map(c => catMap[c] || 0);
+
+                expensesBarChartInstance = new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labelsRU,
+                        datasets: [{
+                            label: 'Расходы',
+                            data: values,
+                            backgroundColor: '#C5A46D',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: textColor, font: { size: 10 } }, grid: { display: false } },
+                            y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
